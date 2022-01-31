@@ -6,12 +6,25 @@
     = {{ result }}
 
     <hr />
-    <button @click="result = operand1 + operand2">+</button>
-    <button @click="result = operand1 - operand2">-</button>
-    <button @click="division">/</button>
-    <button @click="multiple(operand1, operand2)">*</button>
-    <button @click="pow">pow</button>
-    <button @click="floor">floor</button>
+    <div v-if="error">
+      {{error}}
+    </div>
+    <button v-for="(operand, inx) in operands" @click="calculate(operand)" :key="inx">{{operand}}</button>
+    <br />
+    <br />
+    <input type="checkbox" id="checkbox" v-model="checked" @click="checkBox(checked)">
+    <label for="checkbox">Отобразить экраннную клавиатуру</label>
+    <br />
+    <div v-if="checked">
+      <button v-for="(number, inx) in numbers" @click="addNumbers(number)" :key="inx">{{number}}</button>
+      <br />
+      <br />
+      <input type="radio" id="one" value="operand1" v-model="picked">
+      <label for="one">Операнд1</label>
+      <input type="radio" id="two" value="operand2" v-model="picked">
+      <label for="two">Операнд2</label>
+      <br />
+    </div>
   </div>
 </template>
 
@@ -24,17 +37,77 @@
     data() {
       return {
         message: "Hello Vue",
-        operand1: 0,
-        operand2: 0,
+        picked: 'operand1',
+        checked: true,
+        operand1: '',
+        operand2: '',
         result: 0,
+        error: '',
+        operands: ["+", "-", "*", "/", "pow", "floor"],
+        numbers: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "delete"],
       }
     },
     methods: {
-      multiple(op1, op2) {
-        this.result = op1 * op2
+      addNumbers(numberss) {
+        if (numberss == "delete") {
+          this.deleteLastElement(this.picked)
+          return
+        } else {
+          if (this.picked == "operand1") {
+            this.operand1 = this.operand1 + numberss;
+          } else {
+            this.operand2 = this.operand2 + numberss;
+          }
+        }
+      },
+
+      deleteLastElement(picked) {
+        if (picked == "operand1") {
+          this.operand1 = this.operand1.slice(0, -1)
+        } else {
+          this.operand2 = this.operand2.slice(0, -1)
+        }
+      },
+
+      calculate(operation = "+") {
+        switch (operation) {
+          case '+':
+            this.add()
+            break;
+          case '-':
+            this.substract()
+            break;
+          case '*':
+            this.multiple()
+            break;
+          case '/':
+            this.division()
+            break;
+          case 'pow':
+            this.pow()
+            break;
+          case 'floor':
+            this.floor()
+            break;
+        }
+      },
+
+      add() {
+        this.result = Number(this.operand1) + Number(this.operand2)
+      },
+      substract() {
+        this.result = this.operand1 - this.operand2
+      },
+      multiple() {
+        this.result = this.operand1 * this.operand2
       },
       division() {
-        this.result = this.operand1 / this.operand2
+        const { operand1, operand2 } = this
+        if (operand2 == 0) {
+          this.error = "На ноль делить нельзя!"
+          return
+        }
+        this.result = operand1 / operand2
       },
       pow() {
         this.result = Math.pow(this.operand1, this.operand2)
