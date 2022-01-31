@@ -4,6 +4,7 @@
     <input type="text" v-model.number="operand1" />
     <input type="text" v-model.number="operand2" />
     = {{ result }}
+
     <hr />
     <button @click="result = operand1 + operand2">+</button>
     <button @click="result = operand1 - operand2">-</button>
